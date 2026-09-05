@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import HeroSlider from '../components/HeroSlider';
+import HeroSection3D from '../components/HeroSection3D';
 import ProductCard from '../components/ProductCard';
 import api from '../services/api';
 
@@ -14,7 +14,7 @@ export default function Home() {
 
   return (
     <>
-      <HeroSlider />
+      <HeroSection3D />
 
       {/* Featured Collection Editorial */}
       <section className="section-padding">
