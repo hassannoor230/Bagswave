@@ -1,19 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, ChevronLeft, ChevronRight } from 'lucide-react';
-import PufferScene from './3d/PufferScene';
+import { Heart, ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import ProductScene from './3d/ProductScene';
 
 const SLIDES = [
-  { id: 'alpine-navy', product: 'Alpine Puffer', colorName: 'Midnight Navy', color: '#1e3a8a', price: 349, variant: 'jacket', theme: '#3b82f6' },
-  { id: 'alpine-black', product: 'Alpine Puffer', colorName: 'Onyx Black', color: '#111827', price: 349, variant: 'jacket', theme: '#6b7280' },
-  { id: 'alpine-olive', product: 'Alpine Puffer', colorName: 'Forest Olive', color: '#14532d', price: 349, variant: 'jacket', theme: '#4d7c0f' },
-  { id: 'summit-char', product: 'Summit Vest', colorName: 'Charcoal', color: '#374151', price: 279, variant: 'vest', theme: '#9ca3af' },
-  { id: 'summit-steel', product: 'Summit Vest', colorName: 'Steel Grey', color: '#4b5563', price: 279, variant: 'vest', theme: '#9ca3af' },
-  { id: 'aurora-ivory', product: 'Aurora Coat', colorName: 'Winter Ivory', color: '#f5f0e6', price: 489, variant: 'coat', theme: '#d4d0c8' },
+  { id: 'apex-black', product: 'Apex Top Handle', colorName: 'Onyx Black', color: '#111827', price: 420, original: 529, variant: 'tophandle', theme: '#6b7280' },
+  { id: 'apex-cognac', product: 'Apex Top Handle', colorName: 'Cognac', color: '#78350f', price: 420, original: 529, variant: 'tophandle', theme: '#ea580c' },
+  { id: 'apex-navy', product: 'Apex Top Handle', colorName: 'Midnight Navy', color: '#1e3a8a', price: 420, original: 529, variant: 'tophandle', theme: '#2563eb' },
+  { id: 'luna-black', product: 'Luna Crossbody', colorName: 'Onyx Black', color: '#111827', price: 385, original: 489, variant: 'crossbody', theme: '#6b7280' },
+  { id: 'luna-burgundy', product: 'Luna Crossbody', colorName: 'Burgundy', color: '#7c2d12', price: 385, original: 489, variant: 'crossbody', theme: '#b91c1c' },
+  { id: 'luna-stone', product: 'Luna Crossbody', colorName: 'Stone', color: '#d4cfc3', price: 385, original: 489, variant: 'crossbody', theme: '#d4d0c8' },
 ];
 
-const CHEST_PADDING = 'recycled nylon · Primaloft® Gold insulation · water-resistant';
-const ZIPS = '#b89a67';
+const LINE = 'hand-selected vegetable-tanned leather · solid brass hardware · handcrafted in Tuscany';
+const HARDWARE = '#b89a67';
 const EASING = [0.22, 1, 0.36, 1];
 
 const curtainVariants = {
@@ -45,6 +46,9 @@ export default function HeroSection3D() {
   const [hovered, setHovered] = useState(false);
 
   const transitioning = phase !== 'idle';
+  const slide = SLIDES[index];
+  const siblings = SLIDES.filter((s) => s.product === slide.product);
+  const discount = slide.original ? Math.round((1 - slide.price / slide.original) * 100) : 0;
 
   const go = useCallback(
     (nextIndex) => {
@@ -83,34 +87,37 @@ export default function HeroSection3D() {
     return () => window.removeEventListener('keydown', onKey);
   }, [next, prev]);
 
-  const slide = SLIDES[index];
-  const siblings = SLIDES.filter((s) => s.product === slide.product);
-
   return (
-    <section className="relative h-screen min-h-[720px] overflow-hidden text-ivory">
-      {/* Layered background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0b0a09] via-[#161310] to-[#0b0a09]" />
+    <section className="relative min-h-screen overflow-hidden bg-[#11100e] text-ivory lg:min-h-[790px]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_42%,rgba(184,154,103,0.17),transparent_26%),linear-gradient(116deg,#0b0a09_0%,#171511_48%,#0d0d0c_100%)]" />
       <motion.div
-        className="pointer-events-none absolute -top-40 -right-32 h-[560px] w-[560px] rounded-full opacity-45 blur-[110px]"
+        className="pointer-events-none absolute -right-40 top-0 h-[620px] w-[620px] rounded-full opacity-30 blur-[120px]"
         animate={{ backgroundColor: slide.theme }}
         transition={{ duration: 1.2, ease: EASING }}
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(184,154,103,0.16),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(184,154,103,0.08),transparent_60%)]" />
+      <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(247,243,237,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(247,243,237,0.05)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_78%)]" />
 
-      <div className="relative mx-auto flex h-full w-full max-w-[1300px] items-center gap-6 px-6 lg:px-8">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col justify-center px-5 pb-8 pt-28 sm:px-8 lg:min-h-[790px] lg:px-12 lg:pb-12 lg:pt-28">
+        <div className="mb-7 flex items-center justify-between border-b border-ivory/15 pb-4 text-[10px] uppercase tracking-luxury text-cream/60 lg:mb-0 lg:absolute lg:left-12 lg:right-12 lg:top-28">
+          <span>Objects of desire / 01</span>
+          <span className="hidden sm:block">BagsWaves atelier / 2024</span>
+          <span className="text-gold">Scroll to discover</span>
+        </div>
+
+        <div className="grid items-center gap-8 lg:grid-cols-[0.75fr_1.5fr_0.7fr] lg:gap-4">
         {/* Product info (desktop) */}
-        <div className="hidden w-[300px] flex-shrink-0 flex-col gap-8 lg:flex" aria-live="polite">
-          <AnimatePresence>
+        <div className="order-2 hidden flex-col gap-8 lg:order-1 lg:flex" aria-live="polite">
+          <AnimatePresence mode="wait">
             <motion.div
               key={slide.id + '-info'}
               variants={contentVariants}
               initial="initial"
               animate="animate"
               exit="exit"
-              className="flex flex-col gap-6"
+              className="flex max-w-[285px] flex-col gap-6"
             >
-              <motion.span variants={itemVariants} className="text-[10px] tracking-luxury uppercase text-gold">
-                {slide.colorName}
+              <motion.span variants={itemVariants} className="flex items-center gap-3 text-[10px] uppercase tracking-luxury text-gold">
+                <span className="h-px w-8 bg-gold" /> New season / {slide.colorName}
               </motion.span>
               <motion.h1
                 variants={itemVariants}
@@ -119,12 +126,12 @@ export default function HeroSection3D() {
                 {slide.product}
               </motion.h1>
               <motion.p variants={itemVariants} className="text-sm text-cream/70">
-                {CHEST_PADDING}
+                {LINE}
               </motion.p>
               <motion.div variants={itemVariants} className="flex items-baseline gap-3">
                 <span className="text-3xl font-medium text-ivory">${slide.price}.00</span>
-                <span className="text-xs text-cream/50 line-through">$549.00</span>
-                <span className="text-[10px] tracking-luxury uppercase text-gold">28% off</span>
+                <span className="text-xs text-cream/50 line-through">${slide.original}.00</span>
+                <span className="text-[10px] tracking-luxury uppercase text-gold">{discount}% off</span>
               </motion.div>
               <motion.div variants={itemVariants} className="flex items-center gap-3">
                 {siblings.map((s) => (
@@ -143,12 +150,9 @@ export default function HeroSection3D() {
                 ))}
               </motion.div>
               <motion.div variants={itemVariants} className="flex items-center gap-4 pt-1">
-                <button
-                  className="btn-gold w-full"
-                  disabled={transitioning}
-                >
-                  Add to Bag →
-                </button>
+                <Link to="/shop" className="btn-gold w-full gap-2" aria-label={`Shop ${slide.product}`}>
+                  Shop piece <ArrowUpRight size={15} strokeWidth={1.5} />
+                </Link>
                 <button
                   className="flex h-11 w-11 items-center justify-center rounded-full border border-ivory/20 text-ivory transition-colors duration-300 hover:bg-ivory hover:text-espresso"
                   aria-label="Add to wishlist"
@@ -162,17 +166,19 @@ export default function HeroSection3D() {
 
         {/* 3D canvas + curtain */}
         <div
-          className="relative mx-auto aspect-[4/3] w-full max-w-md flex-shrink-0"
+          className="order-1 relative mx-auto aspect-square w-full max-w-[680px] lg:order-2"
           onPointerEnter={() => setHovered(true)}
           onPointerLeave={() => setHovered(false)}
         >
-          <div className="absolute inset-0 rounded-3xl bg-black/40" />
-          <div className="relative h-full w-full overflow-hidden rounded-3xl">
-            <PufferScene
+          <div className="absolute inset-[7%] border border-gold/20 bg-black/20 shadow-[0_30px_90px_rgba(0,0,0,0.35)]" />
+          <div className="absolute left-[12%] top-[12%] text-[9px] uppercase tracking-luxury text-cream/40">B/W — signature form</div>
+          <div className="absolute bottom-[12%] right-[12%] text-[9px] uppercase tracking-luxury text-cream/40">01 — crafted in Tuscany</div>
+          <div className="relative h-full w-full overflow-hidden">
+            <ProductScene
               color={slide.color}
-              zipper={ZIPS}
+              zipper={HARDWARE}
               variant={slide.variant}
-              scale={1.1}
+              scale={1.35}
               hovered={hovered && !transitioning}
               transitioning={transitioning}
             />
@@ -192,7 +198,7 @@ export default function HeroSection3D() {
 
         {/* Desktop carousel */}
         <Carousel
-          className="hidden w-[260px] flex-shrink-0 lg:flex"
+          className="order-3 hidden lg:flex"
           index={index}
           slide={slide}
           siblings={siblings}
@@ -206,27 +212,29 @@ export default function HeroSection3D() {
         />
 
         {/* Mobile content */}
-        <div className="mt-8 lg:hidden" aria-live="polite">
-          <AnimatePresence>
+        <div className="order-2 mt-2 lg:hidden" aria-live="polite">
+          <AnimatePresence mode="wait">
             <motion.div
               key={slide.id + '-minfo'}
               variants={contentVariants}
               initial="initial"
               animate="animate"
               exit="exit"
-              className="flex flex-col items-center gap-5 text-center"
+              className="flex flex-col items-center gap-4 text-center"
             >
+              <span className="text-[10px] uppercase tracking-luxury text-gold">New season / {slide.colorName}</span>
               <h1 className="font-serif text-3xl leading-tight sm:text-4xl">{slide.product}</h1>
-              <p className="text-sm text-cream/70">{CHEST_PADDING}</p>
+              <p className="text-sm text-cream/70">{LINE}</p>
               <div className="flex items-baseline justify-center gap-2">
                 <span className="text-2xl font-medium">${slide.price}.00</span>
-                <span className="text-xs text-cream/50 line-through">$549.00</span>
+                <span className="text-xs text-cream/50 line-through">${slide.original}.00</span>
               </div>
+              <Link to="/shop" className="btn-gold mt-1 gap-2">Shop piece <ArrowUpRight size={15} strokeWidth={1.5} /></Link>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        <div className="mt-7 lg:hidden">
+        <div className="order-3 mt-7 lg:hidden">
           <MobileCarousel
             index={index}
             onNext={next}
@@ -234,6 +242,7 @@ export default function HeroSection3D() {
             onGoto={goTo}
             transitioning={transitioning}
           />
+        </div>
         </div>
       </div>
 
@@ -305,7 +314,7 @@ function Carousel({ className, index, slide, siblings, onNext, onPrev, onGoto, t
               i === index
                 ? 'bg-gold/15 font-medium text-ivory'
                 : 'text-cream/60 hover:bg-ivory/5 hover:text-ivory'
-            }`}
+            }}`}
           >
             <span
               className={`h-8 w-8 flex-shrink-0 rounded-full ring-2 transition-all duration-300 ${
@@ -314,9 +323,7 @@ function Carousel({ className, index, slide, siblings, onNext, onPrev, onGoto, t
               style={{ backgroundColor: s.color }}
             />
             <span className="truncate uppercase tracking-luxury">{s.colorName}</span>
-            {i === index && (
-              <span className="absolute right-2 block h-1.5 w-1.5 rounded-full bg-gold" />
-            )}
+            {i === index && <span className="absolute right-2 block h-1.5 w-1.5 rounded-full bg-gold" />}
           </motion.button>
         ))}
       </div>
