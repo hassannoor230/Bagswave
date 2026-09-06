@@ -1,3 +1,5 @@
+import { PRODUCT_IMAGES } from '../data/productImages';
+
 export default function About() {
   return (
     <div className="pt-24 pb-20">
@@ -16,7 +18,7 @@ export default function About() {
           </p>
         </div>
         <div className="mt-16 aspect-[16/9] bg-cream overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=1200&q=85" alt="Craftsmanship" className="w-full h-full object-cover" />
+          <img src={PRODUCT_IMAGES[2]} alt="Craftsmanship" className="w-full h-full object-contain" />
         </div>
       </div>
     </div>

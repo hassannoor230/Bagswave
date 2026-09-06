@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { PRODUCT_IMAGES } from '../data/productImages';
 
 const slides = [
   {
@@ -11,7 +12,7 @@ const slides = [
     sub: 'Timeless silhouettes designed for modern luxury.',
     cta: 'Shop Collection',
     link: '/collections/the-icon-edit',
-    image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=1200&q=90',
+    image: PRODUCT_IMAGES[0],
     bg: '#0B0A09'
   },
   {
@@ -21,7 +22,7 @@ const slides = [
     sub: 'Pieces that become part of your story.',
     cta: 'Explore Bags',
     link: '/collections/the-new-classics',
-    image: 'https://images.unsplash.com/photo-1590874103328-eac38a6749f9?w=1200&q=90',
+    image: PRODUCT_IMAGES[1],
     bg: '#1a1614'
   },
   {
@@ -31,7 +32,7 @@ const slides = [
     sub: 'Sophistication for nights that matter.',
     cta: 'Discover Edit',
     link: '/collections/evening-edit',
-    image: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=1200&q=90',
+    image: PRODUCT_IMAGES[2],
     bg: '#12100e'
   },
   {
@@ -41,7 +42,7 @@ const slides = [
     sub: 'The defining pieces of the house.',
     cta: 'Shop Signature',
     link: '/collections/signature-collection',
-    image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=1200&q=90',
+    image: PRODUCT_IMAGES[4],
     bg: '#0B0A09'
   }
 ];
@@ -131,20 +132,20 @@ export default function HeroSlider() {
               animate={{ opacity: 0.35, scale: 0.88, x: 40, y: 10 }}
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <img src={nextSlide.image} alt="" className="w-full h-full object-cover object-center" />
+              <img src={nextSlide.image} alt="" className="w-full h-full object-contain object-center mix-blend-multiply" />
             </motion.div>
 
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={slide.id + '-img'}
-                className="relative w-[75%] max-w-lg aspect-[3/4] z-10 shadow-2xl"
+                className="relative w-[75%] max-w-lg aspect-[3/4] z-10"
                 custom={direction}
                 initial={{ opacity: 0, scale: 0.92, x: direction * 60 }}
                 animate={{ opacity: 1, scale: 1, x: 0 }}
                 exit={{ opacity: 0, scale: 0.95, x: direction * -40 }}
                 transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
               >
-                <img src={slide.image} alt={slide.collection} className="w-full h-full object-cover object-center" />
+                <img src={slide.image} alt={slide.collection} className="w-full h-full object-contain object-center mix-blend-multiply" />
               </motion.div>
             </AnimatePresence>
           </div>

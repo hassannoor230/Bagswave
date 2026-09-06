@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import HeroSection3D from '../components/HeroSection3D';
 import ProductCard from '../components/ProductCard';
 import api from '../services/api';
+import { PRODUCT_IMAGES } from '../data/productImages';
 
 export default function Home() {
   const [featured, setFeatured] = useState({ bestsellers: [], newArrivals: [] });
@@ -28,7 +29,7 @@ export default function Home() {
               className="aspect-[4/5] bg-cream overflow-hidden"
             >
               <img
-                src="https://images.unsplash.com/photo-1590874103328-eac38a6749f9?w=900&q=85"
+                src={PRODUCT_IMAGES[1]}
                 alt="The Icon Edit"
                 className="w-full h-full object-cover"
               />
@@ -74,7 +75,7 @@ export default function Home() {
       {/* Editorial Banner */}
       <section className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=1600&q=85"
+          src={PRODUCT_IMAGES[4]}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
         />

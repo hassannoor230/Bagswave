@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
+import { getProductImage } from '../data/productImages';
 
 export default function ProductCard({ product }) {
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -14,16 +15,16 @@ export default function ProductCard({ product }) {
       <div className="relative aspect-[3/4] overflow-hidden bg-cream mb-4">
         <Link to={`/product/${product.slug}`}>
           <img
-            src={product.images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600'}
+            src={getProductImage(product)}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-contain mix-blend-multiply transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
           />
           {product.images?.[1] && (
             <img
-              src={product.images[1]}
+              src={getProductImage(product, 1)}
               alt=""
-              className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              className="absolute inset-0 w-full h-full object-contain mix-blend-multiply opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               loading="lazy"
             />
           )}

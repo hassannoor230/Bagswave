@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { getProductImage, PRODUCT_IMAGES } from '../data/productImages';
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -31,12 +32,12 @@ export default function ProductDetail() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
           <div>
             <div className="aspect-[3/4] bg-cream mb-4 overflow-hidden">
-              <img src={product.images?.[activeImg] || product.images?.[0]} alt={product.name} className="w-full h-full object-cover" />
+              <img src={getProductImage(product, activeImg)} alt={product.name} className="w-full h-full object-contain mix-blend-multiply" />
             </div>
             <div className="flex gap-3">
-              {product.images?.map((img, i) => (
+              {PRODUCT_IMAGES.map((img, i) => (
                 <button key={i} onClick={() => setActiveImg(i)} className={`w-20 h-24 overflow-hidden border ${activeImg === i ? 'border-espresso' : 'border-transparent'}`}>
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img src={img} alt="" className="w-full h-full object-contain mix-blend-multiply" />
                 </button>
               ))}
             </div>

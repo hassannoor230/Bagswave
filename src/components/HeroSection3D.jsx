@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PRODUCT_IMAGES } from '../data/productImages';
 
 const PRODUCTS = [
   {
@@ -10,7 +11,7 @@ const PRODUCTS = [
     eyebrow: 'NEW COLLECTION — 2026',
     title: ['THE ART', 'OF CARRYING'],
     description: 'Timeless silhouettes crafted for modern women who appreciate understated luxury.',
-    image: 'https://astore.pk/cdn/shop/files/Product_2.png?v=1786380081&width=823',
+    image: PRODUCT_IMAGES[0],
     tone: '#b99570',
   },
   {
@@ -19,7 +20,7 @@ const PRODUCTS = [
     eyebrow: 'THE ICON EDIT — 2026',
     title: ['FORM', 'WITH FEELING'],
     description: 'A considered shape, finished by hand and designed to stay with you.',
-    image: 'https://astore.pk/cdn/shop/files/1-4_0066799b-1ed4-4f82-8741-1c6b9b9d89f6.png?v=1763469069&width=360',
+    image: PRODUCT_IMAGES[1],
     tone: '#9b826e',
   },
   {
@@ -28,7 +29,7 @@ const PRODUCTS = [
     eyebrow: 'THE EVENING EDIT — 2026',
     title: ['A SMALL', 'MASTERPIECE'],
     description: 'The essential evening silhouette, made quietly unforgettable.',
-    image: 'https://astore.pk/cdn/shop/files/Product3_4.png?v=1786380285&width=360',
+    image: PRODUCT_IMAGES[2],
     tone: '#b6a18b',
   },
   {
@@ -37,7 +38,7 @@ const PRODUCTS = [
     eyebrow: 'THE NEW CLASSICS — 2026',
     title: ['CARRY', 'YOUR STORY'],
     description: 'Room for the rituals of every day, shaped with a lighter touch.',
-    image: 'https://astore.pk/cdn/shop/files/Product_2.png?v=1786380081&width=823',
+    image: PRODUCT_IMAGES[3],
     tone: '#b99570',
   },
   {
@@ -46,7 +47,7 @@ const PRODUCTS = [
     eyebrow: 'BAGSWAVES ATELIER — 2026',
     title: ['MADE TO', 'BE REMEMBERED'],
     description: 'A signature piece with presence, proportion, and a point of view.',
-    image: 'https://astore.pk/cdn/shop/files/Product_1_6.png?v=1786379675&width=823',
+    image: PRODUCT_IMAGES[4],
     tone: '#8b6a50',
   },
 ];
@@ -104,7 +105,7 @@ export default function HeroSection3D() {
       onMouseLeave={() => { setPaused(false); setPointer({ x: 0, y: 0 }); }}
       onMouseMove={handlePointerMove}
     >
-      <motion.div style={{ y: backgroundY }} className="absolute inset-0 bg-[radial-gradient(circle_at_58%_42%,rgba(255,251,244,0.95),transparent_24%),linear-gradient(120deg,#d8c6b2_0%,#f1e9df_46%,#c6ad95_100%)]" />
+      <motion.div style={{ y: backgroundY }} className="absolute inset-0 bg-[radial-gradient(circle_at_58%_42%,rgba(226,207,188,0.72),transparent_26%),linear-gradient(120deg,#cdb39a_0%,#e3d1bd_46%,#b59679_100%)]" />
       <motion.div
         className="pointer-events-none absolute -right-40 top-0 h-[620px] w-[620px] rounded-full opacity-40 blur-[120px]"
         animate={{ backgroundColor: slide.tone }}
@@ -145,13 +146,13 @@ export default function HeroSection3D() {
         <motion.div className="relative order-1 mx-auto h-[54vh] min-h-[390px] w-full max-w-[700px] lg:order-2 lg:h-[650px]" style={{ y: productY, scale: productScale }}>
           <DepthProduct product={PRODUCTS[(index + 2) % PRODUCTS.length]} className="left-[2%] top-[15%] w-[26%] -rotate-12 opacity-25 blur-[2px]" style={{ x: pointer.x * -10, y: pointer.y * -6 }} />
           <DepthProduct product={PRODUCTS[(index + 3) % PRODUCTS.length]} className="right-[1%] top-[24%] w-[24%] rotate-12 opacity-20 blur-[2px]" style={{ x: pointer.x * -14, y: pointer.y * -8 }} />
-          <motion.div className="absolute inset-0 z-10 flex items-center justify-center mix-blend-multiply" style={{ x: pointer.x * -12, y: pointer.y * -8 }}>
+          <motion.div className="absolute inset-0 z-10 flex items-center justify-center" style={{ x: pointer.x * -12, y: pointer.y * -8 }}>
             <AnimatePresence mode="wait">
               <motion.img
                 key={slide.id}
                 src={slide.image}
                 alt={slide.label}
-                className="h-[92%] w-[78%] object-contain drop-shadow-[0_38px_28px_rgba(72,44,26,0.3)]"
+                className="h-[92%] w-[78%] object-contain mix-blend-multiply drop-shadow-[0_38px_28px_rgba(72,44,26,0.3)]"
                 initial={{ opacity: 0, scale: 0.82, y: 42, rotate: -5 }}
                 animate={{ opacity: 1, scale: 1, y: 0, rotate: pointer.x * 2.5, transition: { duration: 1, ease: EASING } }}
                 exit={{ opacity: 0, scale: 0.92, y: -30, rotate: 5, transition: { duration: 0.65, ease: EASING } }}
@@ -252,8 +253,8 @@ function Carousel({ className, index, slide, onNext, onPrev, onGoto, paused, onP
             whileHover={{ x: 3 }}
             className={`group relative flex items-center gap-3 rounded-md px-3 py-2 text-left text-xs transition-colors ${
               i === index
-                ? 'bg-gold/15 font-medium text-ivory'
-                : 'text-cream/60 hover:bg-ivory/5 hover:text-ivory'
+                ? 'bg-gold/25 font-medium text-espresso'
+                : 'text-espresso/60 hover:bg-espresso/5 hover:text-espresso'
             }}`}
           >
             <span
@@ -262,7 +263,7 @@ function Carousel({ className, index, slide, onNext, onPrev, onGoto, paused, onP
               }`}
               style={{ backgroundColor: s.tone }}
             />
-            <span className="truncate uppercase tracking-luxury">{s.colorName}</span>
+            <span className="truncate uppercase tracking-luxury">{s.label}</span>
             {i === index && <span className="absolute right-2 block h-1.5 w-1.5 rounded-full bg-gold" />}
           </motion.button>
         ))}
