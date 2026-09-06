@@ -1,82 +1,87 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import ProductScene from './3d/ProductScene';
 
-const SLIDES = [
-  { id: 'apex-black', product: 'Apex Top Handle', colorName: 'Onyx Black', color: '#111827', price: 420, original: 529, variant: 'tophandle', theme: '#6b7280' },
-  { id: 'apex-cognac', product: 'Apex Top Handle', colorName: 'Cognac', color: '#78350f', price: 420, original: 529, variant: 'tophandle', theme: '#ea580c' },
-  { id: 'apex-navy', product: 'Apex Top Handle', colorName: 'Midnight Navy', color: '#1e3a8a', price: 420, original: 529, variant: 'tophandle', theme: '#2563eb' },
-  { id: 'luna-black', product: 'Luna Crossbody', colorName: 'Onyx Black', color: '#111827', price: 385, original: 489, variant: 'crossbody', theme: '#6b7280' },
-  { id: 'luna-burgundy', product: 'Luna Crossbody', colorName: 'Burgundy', color: '#7c2d12', price: 385, original: 489, variant: 'crossbody', theme: '#b91c1c' },
-  { id: 'luna-stone', product: 'Luna Crossbody', colorName: 'Stone', color: '#d4cfc3', price: 385, original: 489, variant: 'crossbody', theme: '#d4d0c8' },
+const PRODUCTS = [
+  {
+    id: 'bow-tote',
+    label: 'BOW TOTE',
+    eyebrow: 'NEW COLLECTION — 2026',
+    title: ['THE ART', 'OF CARRYING'],
+    description: 'Timeless silhouettes crafted for modern women who appreciate understated luxury.',
+    image: 'https://astore.pk/cdn/shop/files/Product_2.png?v=1786380081&width=823',
+    tone: '#b99570',
+  },
+  {
+    id: 'signature-bag',
+    label: 'SIGNATURE BAG',
+    eyebrow: 'THE ICON EDIT — 2026',
+    title: ['FORM', 'WITH FEELING'],
+    description: 'A considered shape, finished by hand and designed to stay with you.',
+    image: 'https://astore.pk/cdn/shop/files/1-4_0066799b-1ed4-4f82-8741-1c6b9b9d89f6.png?v=1763469069&width=360',
+    tone: '#9b826e',
+  },
+  {
+    id: 'mini-shoulder',
+    label: 'MINI SHOULDER',
+    eyebrow: 'THE EVENING EDIT — 2026',
+    title: ['A SMALL', 'MASTERPIECE'],
+    description: 'The essential evening silhouette, made quietly unforgettable.',
+    image: 'https://astore.pk/cdn/shop/files/Product3_4.png?v=1786380285&width=360',
+    tone: '#b6a18b',
+  },
+  {
+    id: 'classic-tote',
+    label: 'CLASSIC TOTE',
+    eyebrow: 'THE NEW CLASSICS — 2026',
+    title: ['CARRY', 'YOUR STORY'],
+    description: 'Room for the rituals of every day, shaped with a lighter touch.',
+    image: 'https://astore.pk/cdn/shop/files/Product_2.png?v=1786380081&width=823',
+    tone: '#b99570',
+  },
+  {
+    id: 'atelier-piece',
+    label: 'ATELIER PIECE',
+    eyebrow: 'BAGSWAVES ATELIER — 2026',
+    title: ['MADE TO', 'BE REMEMBERED'],
+    description: 'A signature piece with presence, proportion, and a point of view.',
+    image: 'https://astore.pk/cdn/shop/files/Product_1_6.png?v=1786379675&width=823',
+    tone: '#8b6a50',
+  },
 ];
 
-const LINE = 'hand-selected vegetable-tanned leather · solid brass hardware · handcrafted in Tuscany';
-const HARDWARE = '#b89a67';
 const EASING = [0.22, 1, 0.36, 1];
-
-const curtainVariants = {
-  idle: { scaleY: 0, opacity: 0, transition: { duration: 0.01 } },
-  cover: { scaleY: 1, opacity: 1, transition: { duration: 0.5, ease: EASING } },
-  reveal: { scaleY: 0, opacity: 0, transition: { duration: 0.5, ease: EASING } },
-};
-
-const contentVariants = {
-  initial: { opacity: 0, y: 22 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: EASING, staggerChildren: 0.06, delayChildren: 0.06 },
-  },
-  exit: { opacity: 0, y: -14, transition: { duration: 0.3, ease: EASING } },
-};
-
-const itemVariants = {
-  initial: { opacity: 0, y: 14 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASING } },
-};
+const reveal = { initial: { opacity: 0, y: 26 }, animate: { opacity: 1, y: 0, transition: { duration: 0.9, ease: EASING } } };
 
 export default function HeroSection3D() {
   const [index, setIndex] = useState(0);
-  const [target, setTarget] = useState(null);
-  const [phase, setPhase] = useState('idle');
   const [paused, setPaused] = useState(false);
-  const [hovered, setHovered] = useState(false);
-
-  const transitioning = phase !== 'idle';
-  const slide = SLIDES[index];
-  const siblings = SLIDES.filter((s) => s.product === slide.product);
-  const discount = slide.original ? Math.round((1 - slide.price / slide.original) * 100) : 0;
+  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+  const slide = PRODUCTS[index];
+  const { scrollYProgress } = useScroll();
+  const productY = useTransform(scrollYProgress, [0, 0.2], [0, -70]);
+  const productScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.88]);
+  const backgroundY = useTransform(scrollYProgress, [0, 0.2], [0, 40]);
 
   const go = useCallback(
     (nextIndex) => {
-      const i = ((nextIndex % SLIDES.length) + SLIDES.length) % SLIDES.length;
-      if (i === index || transitioning) return;
-      setTarget(i);
-      setPhase('cover');
+      const i = ((nextIndex % PRODUCTS.length) + PRODUCTS.length) % PRODUCTS.length;
+      if (i === index) return;
+      setIndex(i);
     },
-    [index, transitioning]
+    [index]
   );
 
   const next = useCallback(() => go(index + 1), [go, index]);
   const prev = useCallback(() => go(index - 1), [go, index]);
   const goTo = useCallback((i) => go(i), [go]);
 
-  const onCoverEnd = useCallback(() => {
-    setIndex(target);
-    setTarget(null);
-    setPhase('reveal');
-  }, [target]);
-
-  const onRevealEnd = useCallback(() => setPhase('idle'), []);
-
   useEffect(() => {
-    if (paused || transitioning) return;
+    if (paused) return;
     const id = setInterval(next, 6500);
     return () => clearInterval(id);
-  }, [paused, transitioning, next]);
+  }, [paused, next]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -87,176 +92,115 @@ export default function HeroSection3D() {
     return () => window.removeEventListener('keydown', onKey);
   }, [next, prev]);
 
+  const handlePointerMove = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setPointer({ x: ((event.clientX - rect.left) / rect.width - 0.5) * 2, y: ((event.clientY - rect.top) / rect.height - 0.5) * 2 });
+  };
+
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#11100e] text-ivory lg:min-h-[790px]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_42%,rgba(184,154,103,0.17),transparent_26%),linear-gradient(116deg,#0b0a09_0%,#171511_48%,#0d0d0c_100%)]" />
+    <section
+      className="relative min-h-screen overflow-hidden bg-[#e9e0d4] text-espresso lg:min-h-[820px]"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => { setPaused(false); setPointer({ x: 0, y: 0 }); }}
+      onMouseMove={handlePointerMove}
+    >
+      <motion.div style={{ y: backgroundY }} className="absolute inset-0 bg-[radial-gradient(circle_at_58%_42%,rgba(255,251,244,0.95),transparent_24%),linear-gradient(120deg,#d8c6b2_0%,#f1e9df_46%,#c6ad95_100%)]" />
       <motion.div
-        className="pointer-events-none absolute -right-40 top-0 h-[620px] w-[620px] rounded-full opacity-30 blur-[120px]"
-        animate={{ backgroundColor: slide.theme }}
+        className="pointer-events-none absolute -right-40 top-0 h-[620px] w-[620px] rounded-full opacity-40 blur-[120px]"
+        animate={{ backgroundColor: slide.tone }}
         transition={{ duration: 1.2, ease: EASING }}
       />
-      <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(247,243,237,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(247,243,237,0.05)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_78%)]" />
+      <div className="pointer-events-none absolute -bottom-32 left-1/2 h-[440px] w-[780px] -translate-x-1/2 rounded-[50%] border border-white/50 bg-[#c4ad95]/30 blur-[1px]" />
+      <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(71,48,35,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(71,48,35,0.08)_1px,transparent_1px)] [background-size:84px_84px] [mask-image:linear-gradient(to_bottom,black,transparent_80%)]" />
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col justify-center px-5 pb-8 pt-28 sm:px-8 lg:min-h-[790px] lg:px-12 lg:pb-12 lg:pt-28">
-        <div className="mb-7 flex items-center justify-between border-b border-ivory/15 pb-4 text-[10px] uppercase tracking-luxury text-cream/60 lg:mb-0 lg:absolute lg:left-12 lg:right-12 lg:top-28">
-          <span>Objects of desire / 01</span>
-          <span className="hidden sm:block">BagsWaves atelier / 2024</span>
-          <span className="text-gold">Scroll to discover</span>
+      <div className="relative mx-auto flex min-h-screen w-full max-w-[1500px] flex-col justify-center px-5 pb-10 pt-28 sm:px-8 lg:min-h-[820px] lg:px-16 lg:pb-14 lg:pt-32">
+        <div className="absolute left-5 right-5 top-24 flex items-center justify-between border-b border-espresso/20 pb-4 text-[10px] uppercase tracking-luxury text-espresso/60 sm:left-8 sm:right-8 lg:left-16 lg:right-16 lg:top-32">
+          <span>Objects of desire / {String(index + 1).padStart(2, '0')}</span>
+          <span className="hidden sm:block">BagsWaves atelier / 2026</span>
+          <span className="text-espresso">Scroll to discover ↓</span>
         </div>
 
-        <div className="grid items-center gap-8 lg:grid-cols-[0.75fr_1.5fr_0.7fr] lg:gap-4">
-        {/* Product info (desktop) */}
-        <div className="order-2 hidden flex-col gap-8 lg:order-1 lg:flex" aria-live="polite">
+        <div className="grid items-center gap-8 lg:grid-cols-[0.75fr_1.5fr_0.7fr] lg:gap-0">
+        <motion.div className="order-2 z-20 lg:order-1" style={{ x: pointer.x * 4, y: pointer.y * 3 }} aria-live="polite">
           <AnimatePresence mode="wait">
             <motion.div
-              key={slide.id + '-info'}
-              variants={contentVariants}
+              key={slide.id}
+              variants={reveal}
               initial="initial"
               animate="animate"
               exit="exit"
-              className="flex max-w-[285px] flex-col gap-6"
+              className="flex max-w-[335px] flex-col gap-5"
             >
-              <motion.span variants={itemVariants} className="flex items-center gap-3 text-[10px] uppercase tracking-luxury text-gold">
-                <span className="h-px w-8 bg-gold" /> New season / {slide.colorName}
-              </motion.span>
-              <motion.h1
-                variants={itemVariants}
-                className="font-serif text-4xl leading-[1.05] tracking-wide sm:text-5xl"
-              >
-                {slide.product}
-              </motion.h1>
-              <motion.p variants={itemVariants} className="text-sm text-cream/70">
-                {LINE}
-              </motion.p>
-              <motion.div variants={itemVariants} className="flex items-baseline gap-3">
-                <span className="text-3xl font-medium text-ivory">${slide.price}.00</span>
-                <span className="text-xs text-cream/50 line-through">${slide.original}.00</span>
-                <span className="text-[10px] tracking-luxury uppercase text-gold">{discount}% off</span>
-              </motion.div>
-              <motion.div variants={itemVariants} className="flex items-center gap-3">
-                {siblings.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => goTo(SLIDES.indexOf(s))}
-                    disabled={transitioning}
-                    className={`relative h-9 w-9 rounded-full border-2 transition-all duration-300 disabled:opacity-60 ${
-                      s.id === slide.id
-                        ? 'scale-110 border-gold ring-2 ring-gold'
-                        : 'scale-100 border-ivory/30 hover:scale-105'
-                    }`}
-                    style={{ backgroundColor: s.color }}
-                    aria-label={s.colorName}
-                  />
-                ))}
-              </motion.div>
-              <motion.div variants={itemVariants} className="flex items-center gap-4 pt-1">
-                <Link to="/shop" className="btn-gold w-full gap-2" aria-label={`Shop ${slide.product}`}>
-                  Shop piece <ArrowUpRight size={15} strokeWidth={1.5} />
-                </Link>
-                <button
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-ivory/20 text-ivory transition-colors duration-300 hover:bg-ivory hover:text-espresso"
-                  aria-label="Add to wishlist"
-                >
-                  <Heart size={18} strokeWidth={1.5} />
-                </button>
-              </motion.div>
+              <span className="text-[10px] uppercase tracking-luxury text-gold">{slide.eyebrow}</span>
+              <h1 className="font-serif text-6xl leading-[0.88] tracking-wide text-espresso sm:text-7xl">{slide.title.map((line) => <span key={line} className="block">{line}</span>)}</h1>
+              <p className="max-w-xs text-sm leading-relaxed text-espresso/65">{slide.description}</p>
+              <div className="flex flex-wrap gap-3 pt-3">
+                <Link to="/collections/the-icon-edit" className="btn-primary gap-2">Explore collection <ArrowUpRight size={15} strokeWidth={1.5} /></Link>
+                <Link to="/shop" className="btn-outline border-espresso gap-2">Shop now <ArrowUpRight size={15} strokeWidth={1.5} /></Link>
+              </div>
             </motion.div>
           </AnimatePresence>
-        </div>
+        </motion.div>
 
-        {/* 3D canvas + curtain */}
-        <div
-          className="order-1 relative mx-auto aspect-square w-full max-w-[680px] lg:order-2"
-          onPointerEnter={() => setHovered(true)}
-          onPointerLeave={() => setHovered(false)}
-        >
-          <div className="absolute inset-[7%] border border-gold/20 bg-black/20 shadow-[0_30px_90px_rgba(0,0,0,0.35)]" />
-          <div className="absolute left-[12%] top-[12%] text-[9px] uppercase tracking-luxury text-cream/40">B/W — signature form</div>
-          <div className="absolute bottom-[12%] right-[12%] text-[9px] uppercase tracking-luxury text-cream/40">01 — crafted in Tuscany</div>
-          <div className="relative h-full w-full overflow-hidden">
-            <ProductScene
-              color={slide.color}
-              zipper={HARDWARE}
-              variant={slide.variant}
-              scale={1.35}
-              hovered={hovered && !transitioning}
-              transitioning={transitioning}
-            />
-            <motion.div
-              className="pointer-events-none absolute inset-0 z-10 origin-top"
-              style={{ backgroundColor: '#0b0a09' }}
-              variants={curtainVariants}
-              initial="idle"
-              animate={phase}
-              onAnimationComplete={(latest) => {
-                if (phase === 'cover' && latest.scaleY >= 0.999) onCoverEnd();
-                else if (phase === 'reveal' && latest.scaleY <= 0.001) onRevealEnd();
-              }}
-            />
-          </div>
-        </div>
+        <motion.div className="relative order-1 mx-auto h-[54vh] min-h-[390px] w-full max-w-[700px] lg:order-2 lg:h-[650px]" style={{ y: productY, scale: productScale }}>
+          <DepthProduct product={PRODUCTS[(index + 2) % PRODUCTS.length]} className="left-[2%] top-[15%] w-[26%] -rotate-12 opacity-25 blur-[2px]" style={{ x: pointer.x * -10, y: pointer.y * -6 }} />
+          <DepthProduct product={PRODUCTS[(index + 3) % PRODUCTS.length]} className="right-[1%] top-[24%] w-[24%] rotate-12 opacity-20 blur-[2px]" style={{ x: pointer.x * -14, y: pointer.y * -8 }} />
+          <motion.div className="absolute inset-0 z-10 flex items-center justify-center mix-blend-multiply" style={{ x: pointer.x * -12, y: pointer.y * -8 }}>
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={slide.id}
+                src={slide.image}
+                alt={slide.label}
+                className="h-[92%] w-[78%] object-contain drop-shadow-[0_38px_28px_rgba(72,44,26,0.3)]"
+                initial={{ opacity: 0, scale: 0.82, y: 42, rotate: -5 }}
+                animate={{ opacity: 1, scale: 1, y: 0, rotate: pointer.x * 2.5, transition: { duration: 1, ease: EASING } }}
+                exit={{ opacity: 0, scale: 0.92, y: -30, rotate: 5, transition: { duration: 0.65, ease: EASING } }}
+              />
+            </AnimatePresence>
+          </motion.div>
+          <div className="absolute bottom-[5%] left-1/2 z-0 h-10 w-[54%] -translate-x-1/2 rounded-[50%] bg-[#684b38]/25 blur-2xl" />
+          <div className="absolute left-[10%] top-[10%] text-[9px] uppercase tracking-luxury text-espresso/45">B/W — signature form</div>
+          <div className="absolute bottom-[12%] right-[8%] text-[9px] uppercase tracking-luxury text-espresso/45">01 — atelier object</div>
+        </motion.div>
 
-        {/* Desktop carousel */}
         <Carousel
           className="order-3 hidden lg:flex"
           index={index}
           slide={slide}
-          siblings={siblings}
           onNext={next}
           onPrev={prev}
           onGoto={goTo}
-          transitioning={transitioning}
           paused={paused}
           onPause={() => setPaused(true)}
           onResume={() => setPaused(false)}
         />
 
         {/* Mobile content */}
-        <div className="order-2 mt-2 lg:hidden" aria-live="polite">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={slide.id + '-minfo'}
-              variants={contentVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="flex flex-col items-center gap-4 text-center"
-            >
-              <span className="text-[10px] uppercase tracking-luxury text-gold">New season / {slide.colorName}</span>
-              <h1 className="font-serif text-3xl leading-tight sm:text-4xl">{slide.product}</h1>
-              <p className="text-sm text-cream/70">{LINE}</p>
-              <div className="flex items-baseline justify-center gap-2">
-                <span className="text-2xl font-medium">${slide.price}.00</span>
-                <span className="text-xs text-cream/50 line-through">${slide.original}.00</span>
-              </div>
-              <Link to="/shop" className="btn-gold mt-1 gap-2">Shop piece <ArrowUpRight size={15} strokeWidth={1.5} /></Link>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
         <div className="order-3 mt-7 lg:hidden">
           <MobileCarousel
             index={index}
             onNext={next}
             onPrev={prev}
             onGoto={goTo}
-            transitioning={transitioning}
           />
         </div>
         </div>
       </div>
 
-      <NavArrows next={next} prev={prev} disabled={transitioning} />
+      <NavArrows next={next} prev={prev} />
     </section>
   );
 }
 
-function NavArrows({ next, prev, disabled }) {
+function DepthProduct({ product, className, style }) {
+  return <motion.img src={product.image} alt="" aria-hidden="true" className={`pointer-events-none absolute z-0 object-contain mix-blend-multiply ${className}`} style={style} />;
+}
+
+function NavArrows({ next, prev }) {
   return (
     <div className="pointer-events-none absolute inset-0 flex items-center justify-between p-4 lg:p-6">
       <motion.button
         onClick={prev}
-        disabled={disabled}
         whileHover={{ scale: 1.1 }}
         className="pointer-events-auto relative z-20 rounded-full border border-ivory/20 p-2 text-ivory opacity-60 transition-all duration-300 hover:border-gold hover:bg-gold hover:text-espresso hover:opacity-100 disabled:cursor-not-allowed"
         aria-label="Previous"
@@ -265,7 +209,6 @@ function NavArrows({ next, prev, disabled }) {
       </motion.button>
       <motion.button
         onClick={next}
-        disabled={disabled}
         whileHover={{ scale: 1.1 }}
         className="pointer-events-auto relative z-20 rounded-full border border-ivory/20 p-2 text-ivory opacity-60 transition-all duration-300 hover:border-gold hover:bg-gold hover:text-espresso hover:opacity-100 disabled:cursor-not-allowed"
         aria-label="Next"
@@ -276,17 +219,16 @@ function NavArrows({ next, prev, disabled }) {
   );
 }
 
-function Carousel({ className, index, slide, siblings, onNext, onPrev, onGoto, transitioning, paused, onPause, onResume }) {
+function Carousel({ className, index, slide, onNext, onPrev, onGoto, paused, onPause, onResume }) {
   return (
     <div className={className} onMouseEnter={onPause} onMouseLeave={onResume}>
       <div className="mb-4 flex items-center justify-between">
         <span className="text-[11px] tracking-luxury text-cream/50">
-          {String(index + 1).padStart(2, '0')} / {String(SLIDES.length).padStart(2, '0')}
+          {String(index + 1).padStart(2, '0')} / {String(PRODUCTS.length).padStart(2, '0')}
         </span>
         <div className="flex gap-1">
           <button
             onClick={onPrev}
-            disabled={transitioning}
             className="rounded p-1 text-cream/60 transition-colors hover:text-ivory disabled:opacity-50"
             aria-label="Previous"
           >
@@ -294,7 +236,6 @@ function Carousel({ className, index, slide, siblings, onNext, onPrev, onGoto, t
           </button>
           <button
             onClick={onNext}
-            disabled={transitioning}
             className="rounded p-1 text-cream/60 transition-colors hover:text-ivory disabled:opacity-50"
             aria-label="Next"
           >
@@ -304,13 +245,12 @@ function Carousel({ className, index, slide, siblings, onNext, onPrev, onGoto, t
       </div>
 
       <div className="flex flex-col gap-1.5 overflow-y-auto pr-1">
-        {SLIDES.map((s, i) => (
+        {PRODUCTS.map((s, i) => (
           <motion.button
             key={s.id}
             onClick={() => onGoto(i)}
-            disabled={transitioning}
             whileHover={{ x: 3 }}
-            className={`group relative flex items-center gap-3 rounded-md px-3 py-2 text-left text-xs transition-colors disabled:opacity-50 ${
+            className={`group relative flex items-center gap-3 rounded-md px-3 py-2 text-left text-xs transition-colors ${
               i === index
                 ? 'bg-gold/15 font-medium text-ivory'
                 : 'text-cream/60 hover:bg-ivory/5 hover:text-ivory'
@@ -320,7 +260,7 @@ function Carousel({ className, index, slide, siblings, onNext, onPrev, onGoto, t
               className={`h-8 w-8 flex-shrink-0 rounded-full ring-2 transition-all duration-300 ${
                 i === index ? 'ring-gold' : 'ring-ivory/10 group-hover:ring-ivory/30'
               }`}
-              style={{ backgroundColor: s.color }}
+              style={{ backgroundColor: s.tone }}
             />
             <span className="truncate uppercase tracking-luxury">{s.colorName}</span>
             {i === index && <span className="absolute right-2 block h-1.5 w-1.5 rounded-full bg-gold" />}
@@ -335,32 +275,30 @@ function Carousel({ className, index, slide, siblings, onNext, onPrev, onGoto, t
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
-        <span className="block h-3 w-3 rounded-full" style={{ backgroundColor: slide.color }} />
-        <span className="text-[10px] tracking-luxury uppercase text-cream/50">{slide.colorName}</span>
+        <span className="block h-3 w-3 rounded-full" style={{ backgroundColor: slide.tone }} />
+        <span className="text-[10px] tracking-luxury uppercase text-espresso/50">{slide.label}</span>
       </motion.div>
     </div>
   );
 }
 
-function MobileCarousel({ index, onNext, onPrev, onGoto, transitioning }) {
+function MobileCarousel({ index, onNext, onPrev, onGoto }) {
   return (
     <div className="flex items-center justify-center gap-4">
       <button
         onClick={onPrev}
-        disabled={transitioning}
         className="rounded-full border border-ivory/20 p-2 text-ivory disabled:opacity-50"
         aria-label="Previous"
       >
         <ChevronLeft size={16} strokeWidth={1.5} />
       </button>
       <div className="flex items-center gap-1.5">
-        {SLIDES.map((s, i) => (
+        {PRODUCTS.map((s, i) => (
           <button
             key={s.id}
             onClick={() => onGoto(i)}
-            disabled={transitioning}
-            className={`relative h-2.5 w-2.5 rounded-full transition-all disabled:opacity-50 ${
-              i === index ? 'w-6 bg-gold' : 'bg-ivory/20 hover:bg-ivory/40'
+            className={`relative h-2.5 w-2.5 rounded-full transition-all ${
+              i === index ? 'w-6 bg-gold' : 'bg-espresso/20 hover:bg-espresso/40'
             }`}
             aria-label={`Slide ${i + 1}`}
           />
@@ -368,7 +306,6 @@ function MobileCarousel({ index, onNext, onPrev, onGoto, transitioning }) {
       </div>
       <button
         onClick={onNext}
-        disabled={transitioning}
         className="rounded-full border border-ivory/20 p-2 text-ivory disabled:opacity-50"
         aria-label="Next"
       >
